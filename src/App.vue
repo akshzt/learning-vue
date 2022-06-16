@@ -1,91 +1,29 @@
 <template>
-  <form @submit="submitForm">
-    <div>
-      <pre>
-        {{ JSON.stringify(formValues, null, 2) }}
-      </pre>
-    </div>
-    <div>
-      <label for="name">Name</label>
-      <input type="text" id="name" v-model="formValues.name">
-    </div>
+  <h2>Full Name: {{firstName}} {{lastName}}</h2>
+  <h2>Computed Full Name: {{fullName}}</h2>
 
-    <div>
-      <label for="profile">Profile Summary</label>
-      <textarea id="profile" v-model="formValues.profileSummary" />
-    </div>
+  <button @click="changeFullName">Chage Fullname</button>
 
-    <div>
-      <label for="country">Country</label>
-      <select id="country" v-model="formValues.country">
-        <option value="">Select a Country</option>
-        <option value="india">India</option>
-        <option value="usa">USA</option>
-        <option value="china">China</option>
-      </select>
-    </div>
+  <button @click="items.push({id: 4, title:'Car', price: 1000})">Add Item</button>
+  <h2>Total: {{total}} </h2>
 
-    <div>
-      <label for="job-location">Job Location</label>
-      <select id="job-location" multiple v-model="formValues.jobLocation">
-        <option value="india">India</option>
-        <option value="usa">USA</option>
-        <option value="china">China</option>
-      </select>
-    </div>
+  <template v-for="item in items" :key="item.id">
+    <h2 v-if="item.price > 100">{{item.title}}: {{item.price}}</h2>
+  </template>
 
-    <div>
-      <input type="checkbox" id="remoteWork" v-model="formValues.remoteWork" true-value="yes" false-value="no" />
-      <label for="remoteWork">Open to remote work?</label>
-    </div>
+  <h2 v-for="item in expensiveItems" :key="item.id">
+    {{item.title}}: {{item.price}}
+  </h2>
 
-    <div>
-      <label>Skill Set</label>
-      <input type="checkbox" id="html" value="html" v-model="formValues.skillSet" />
-      <label for="html">HTML</label>
-      <input type="checkbox" id="css" value="css" v-model="formValues.skillSet" />
-      <label for="css">CSS</label>
-      <input type="checkbox" id="javascript" value="javascript" v-model="formValues.skillSet" />
-      <label for="javascript">JavaScript</label>
-    </div>
+  <h2>Volume: {{volume}}</h2>
+  <button @click="volume += 2">Increase Volume</button>
+  <button @click="volume -= 2">Decrease Volume</button>
 
-    <div>
-      <label>Years of Experience</label>
-      <input
-        type="radio"
-        id="0-2"
-        value="0-2"
-        v-model="formValues.yearsOfExperience"
-      />
-      <label for="0-2">0-2</label>
-      <input
-        type="radio"
-        id="3-5"
-        value="3-5"
-        v-model="formValues.yearsOfExperience"
-      />
-      <label for="3-5">3-5</label>
-      <input
-        type="radio"
-        id="6-10"
-        value="6-10"
-        v-model="formValues.yearsOfExperience"
-      />
-      <label for="6-10">6-10</label>
-      <input
-        type="radio"
-        id="10+"
-        value="10+"
-        v-model="formValues.yearsOfExperience"
-      />
-      <label for="10+">10+</label>
-    </div>
+  <input type="text" v-model="name" />
 
-    <div>
-      <button>Submit</button>
-    </div>
+  <input type="text" v-model="movieInfo.actor" />
+  <input type="text" v-model="movieInfo.title" />
 
-  </form>
 </template>
 
 <script>
@@ -93,23 +31,73 @@ export default {
   name: 'App',
   data() {
     return {
-      formValues: {
-        name: '',
-        profileSummary: '',
-        country: '',
-        jobLocation: [],
-        remoteWork: 'no',
-        skillSet: [],
-        yearsOfExperience: '',
+      firstName: 'Bruce',
+      lastName: 'Wayne',
+      name: 'Batman',
+      items: [
+        {
+          id: 1,
+          title: 'TV',
+          price: 100
+        }, 
+        {
+          id: 2,
+          title: 'Phone',
+          price: 70
+        },
+        {
+          id: 3,
+          title: 'medicine',
+          price: 300
+        },
+      ],
+      volume: 0,
+      movieInfo: {
+        actor: '',
+        title: '',
       }
     }
   },
   methods: {
-    submitForm(event) {
-      event.preventDefault();
-      console.log("Form Values", this.formValues);
+    changeFullName() {
+      this.fullName = 'Clark Kent';
     }
   },
+  computed: {
+    fullName: {
+      get() {
+        return `${this.firstName} ${this.lastName}`;
+      },
+      set(value) {
+        [this.firstName, this.lastName] = value.split(' ');
+      }
+    },
+    total() {
+      return this.items.reduce( (total, current) => total += current.price, 0);
+    },
+    expensiveItems() {
+      return this.items.filter( item => item.price > 100 );
+    }
+  },
+  watch: {
+    volume(newValue, oldValue) {
+      if( newValue > oldValue && newValue === 16 ) {
+        alert('Volume too high!');
+      }
+    },
+    name: {
+      handler(newValue) {
+      console.log(`Api with ${newValue}`);
+      },
+      immediate: true,
+    },
+    movieInfo: {
+      handler(newValue) {
+        console.log(`Api with actor: ${newValue.actor} title: ${newValue.title}`);
+      },
+      deep: true
+    }
+  }
 }
 </script>
 
